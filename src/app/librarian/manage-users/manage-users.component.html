@@ -1,1 +1,42 @@
-<p>manage-users works!</p>
+<h2>Manage Users</h2>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<div *ngIf="errorMessage" style="color:red">
+  {{ errorMessage }}
+</div>
+
+<table border="1" cellpadding="8" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Full Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Active</th>
+      <th>Max Books</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{ user.username }}</td>
+      <td>{{ user.fullName }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td>
+        <span [style.color]="user.isActive ? 'green' : 'red'">
+          {{ user.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </td>
+      <td>{{ user.maxBooksAllowed }}</td>
+      <td>
+        <button (click)="viewDetails(user.id)">Details</button>
+        <button (click)="toggleActivation(user)">
+          {{ user.isActive ? 'Deactivate' : 'Activate' }}
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

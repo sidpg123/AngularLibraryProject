@@ -1,1 +1,68 @@
-<p>manage-books works!</p>
+<h2>Manage Books</h2>
+
+<div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+    <h2>Manage Books</h2>
+    <button (click)="openCreateForm()">➕ Add Book</button>
+</div>
+
+<!-- Controls -->
+<div style="margin-bottom:15px; display:flex; gap:10px;">
+
+    <!-- Search -->
+    <input type="text" placeholder="Search by title, ISBN, category" [(ngModel)]="searchTerm" />
+
+    <!-- Category Filter -->
+    <select [(ngModel)]="selectedCategory">
+        <option value="all">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+        </option>
+    </select>
+
+</div>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<div *ngIf="errorMessage" style="color:red">
+    {{ errorMessage }}
+</div>
+
+<table border="1" cellpadding="8" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th (click)="sortBy('title')">Title</th>
+            <th (click)="sortBy('category')">Category</th>
+            <th (click)="sortBy('publishedYear')">Year</th>
+            <th (click)="sortBy('totalCopies')">Total</th>
+            <th (click)="sortBy('availableCopies')">Available</th>
+            <th (click)="sortBy('issuedCopies')">Issued</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr *ngFor="let book of processedBooks">
+            <td>{{ book.title }}</td>
+            <td>{{ book.category }}</td>
+            <td>{{ book.publishedYear }}</td>
+            <td>{{ book.totalCopies }}</td>
+            <td [style.color]="book.availableCopies === 0 ? 'red' : 'black'">
+                {{ book.availableCopies }}
+            </td>
+            <td>{{ book.issuedCopies }}</td>
+            <td>
+                <button (click)="viewDetails(book.id)">Details</button>
+                <button (click)="editBook(book)">Edit</button>
+                <button (click)="deleteBook(book.id)">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div *ngIf="showFormModal" style="position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,0.5);
+            display:flex; justify-content:center; align-items:center;">
+
+    <app-book-form [book]="selectedBook" (saved)="onBookSaved()" (cancelled)="closeForm()">
+    </app-book-form>
+
+</div>

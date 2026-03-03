@@ -1,1 +1,57 @@
-<p>my-books works!</p>
+<h2>My Books</h2>
+
+<!-- Fine Summary Section -->
+<div style="border:1px solid #aaa; padding:10px; margin-bottom:15px;">
+
+  <h3>Fine Summary</h3>
+
+  <div *ngIf="fineLoading">Loading fines...</div>
+
+  <div *ngIf="fineError" style="color:red;">
+    {{ fineError }}
+  </div>
+
+  <div *ngIf="fineSummary">
+
+    <p><strong>Total Lifetime Fines:</strong> ${{ fineSummary.totalFines }}</p>
+    <p><strong>Paid Fines:</strong> ${{ fineSummary.paidFines }}</p>
+    <p style="color:red;">
+      <strong>Unpaid Fines:</strong> ${{ fineSummary.unpaidFines }}
+    </p>
+    <p>
+      <strong>Unpaid Issues:</strong> {{ fineSummary.unpaidIssuesCount }}
+    </p>
+
+    <button
+      *ngIf="fineSummary.unpaidFines > 0"
+      [disabled]="fineLoading"
+      (click)="payAllFines()">
+      Pay All Fines
+    </button>
+
+  </div>
+</div>
+
+<div style="margin-bottom:10px;">
+  <button (click)="changeFilter('all')">All</button>
+  <button (click)="changeFilter('issued')">Issued</button>
+  <button (click)="changeFilter('overdue')">Overdue</button>
+  <button (click)="changeFilter('returned')">Returned</button>
+</div>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<div *ngIf="errorMessage" style="color:red">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="filteredIssues.length === 0">
+  No books found.
+</div>
+
+<div *ngFor="let issue of filteredIssues">
+  <app-issue-card
+  [issue]="issue"
+  [calculatedFine]="calculatedFines[issue.id]"
+  (viewDetails)="openDetails($event)">
+</app-issue-card>
+</div>

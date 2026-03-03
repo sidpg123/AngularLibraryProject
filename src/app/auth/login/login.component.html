@@ -1,1 +1,53 @@
-<p>login works!</p>
+<form #loginForm="ngForm" (ngSubmit)="login(); loginForm.reset()">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input 
+      id="username"
+      type="text" 
+      name="username" 
+      [(ngModel)]="username" 
+      required 
+      minlength="3"
+      #formUsername="ngModel"
+      [class.is-invalid]="formUsername.invalid && formUsername.touched"
+    >
+
+    @if (formUsername.invalid && formUsername.touched) {
+      <div class="error-container">
+        @if (formUsername.errors?.['required']) {
+          <span>Username field is required</span>
+        } @else if (formUsername.errors?.['minlength']) {
+          <span>Username must be at least 3 letters</span>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input 
+      id="password"
+      type="password" 
+      name="password" 
+      [(ngModel)]="password" 
+      required 
+      minlength="6"
+      #formPassword="ngModel"
+      [class.is-invalid]="formPassword.invalid && formPassword.touched"
+    >
+
+    @if (formPassword.invalid && formPassword.touched) {
+      <div class="error-container">
+        @if (formPassword.errors?.['required']) {
+          <span>Password field is required</span>
+        } @else if (formPassword.errors?.['minlength']) {
+          <span>Password must be at least 6 letters</span>
+        }
+      </div>
+    }
+  </div>
+
+  <button type="submit" [disabled]="loginForm.invalid">
+    Login
+  </button>
+</form>

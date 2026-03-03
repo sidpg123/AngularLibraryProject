@@ -1,0 +1,82 @@
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<div *ngIf="errorMessage" style="color:red">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="user">
+
+  <h2>User Details</h2>
+
+  <p><strong>Username:</strong> {{ user.username }}</p>
+  <p><strong>Full Name:</strong> {{ user.fullName }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Phone:</strong> {{ user.phone }}</p>
+  <p><strong>Address:</strong> {{ user.address }}</p>
+  <p><strong>Role:</strong> {{ user.role }}</p>
+  <p>
+    <strong>Status:</strong>
+    <span [style.color]="user.isActive ? 'green' : 'red'">
+      {{ user.isActive ? 'Active' : 'Inactive' }}
+    </span>
+  </p>
+
+  <button (click)="openEdit()">Edit</button>
+  <button (click)="toggleActivation()">
+    {{ user.isActive ? 'Deactivate' : 'Activate' }}
+  </button>
+  <button (click)="goBack()">Back</button>
+
+  <hr>
+
+  <h3>Borrowing Stats</h3>
+
+  <div *ngIf="stats">
+    <p>Total Borrowed: {{ stats.totalBorrowed }}</p>
+    <p>Currently Borrowed: {{ stats.currentlyBorrowed }}</p>
+    <p>Returned: {{ stats.returned }}</p>
+    <p>Overdue: {{ stats.overdue }}</p>
+    <p>Total Fines: ${{ stats.totalFines }}</p>
+    <p>Paid Fines: ${{ stats.paidFines }}</p>
+  </div>
+
+  <hr>
+
+  <h3>Borrowing History</h3>
+
+  <table border="1" cellpadding="8" cellspacing="0" width="100%">
+    <thead>
+      <tr>
+        <th>Book</th>
+        <th>Status</th>
+        <th>Issue Date</th>
+        <th>Due Date</th>
+        <th>Return Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let issue of issues">
+        <td>{{ issue.book?.title }}</td>
+        <td>{{ issue.status }}</td>
+        <td>{{ issue.issueDate | date }}</td>
+        <td>{{ issue.dueDate | date }}</td>
+        <td>{{ issue.returnDate | date }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Edit Modal -->
+<div *ngIf="showEditModal"
+     style="position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,0.5);
+            display:flex; justify-content:center; align-items:center;">
+
+  <app-user-form
+    [user]="user!"
+    (saved)="onUserUpdated()"
+    (cancelled)="closeEdit()">
+  </app-user-form>
+
+</div>

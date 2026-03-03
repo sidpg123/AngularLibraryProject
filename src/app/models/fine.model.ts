@@ -1,35 +1,60 @@
-export interface FineItem {
-  issueId:    number;
-  bookTitle:  string;
+export interface FineIssueSummary {
+  issueId: number;
+  bookTitle: string;
   fineAmount: number;
-  finePaid:   boolean;
+  finePaid: boolean;
 }
 
-// Shape returned by GET /api/fines/user/:userId
-export interface FinesResponse {
-  totalFines:        number;   // lifetime amount ever accrued (paid + unpaid)
-  paidFines:         number;
-  unpaidFines:       number;   // current outstanding balance
+export interface UserFineSummary {
+  totalFines: number;
+  paidFines: number;
+  unpaidFines: number;
   unpaidIssuesCount: number;
-  issuesWithFines:   FineItem[];
+  issuesWithFines: FineIssueSummary[];
 }
 
-// Shape returned by POST /api/fines/:issueId/pay
 export interface PayFineResponse {
-  message:        string;
-  amountPaid:     number;
+  message: string;
+  amountPaid: number;
   remainingFines: number;
 }
 
-// Shape returned by GET /api/fines/calculate/:issueId (fine preview)
-export interface FinePreview {
-  issueId:        number;
-  dueDate:        string;
-  gracePeriodDays:number;
-  overdueDays:    number;
-  finePerDay:     number;
+export interface PayAllFinesResponse {
+  message: string;
+  amountPaid: number;
+  issuesPaid: number;
+  remainingFines: number;
+}
+
+export interface FineCalculationPreview {
+  issueId: number;
+  dueDate: string;
+  gracePeriodDays: number;
+  overdueDays: number;
+  finePerDay: number;
   calculatedFine: number;
   maxFinePerBook: number;
-  isOverdue:      boolean;
-  status:         string;
-}   
+  isOverdue: boolean;
+  status: 'issued' | 'overdue' | 'returned';
+}
+
+export interface FineReportSummary {
+  totalUnpaidFines: number;
+  totalPaidFines: number;
+  usersWithUnpaidFines: number;
+  totalUsersWithFines: number;
+}
+
+export interface FineReportUser {
+  userId: number;
+  username: string;
+  fullName: string;
+  unpaidFines: number;
+  paidFines: number;
+  unpaidIssuesCount: number;
+}
+
+export interface FineReport {
+  summary: FineReportSummary;
+  users: FineReportUser[];
+}

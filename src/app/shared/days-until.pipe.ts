@@ -1,12 +1,26 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 
-@Pipe({
-  name: 'daysUntil'
+@Directive({
+  selector: '[appRole]',
+  standalone: true
 })
-export class DaysUntilPipe implements PipeTransform {
+export class RoleDirective {
 
-  transform(value: unknown, ...args: unknown[]): unknown {
-    return null;
+  constructor(
+    private templateRef: TemplateRef<any>,
+    private viewContainer: ViewContainerRef,
+    private authService: AuthService
+  ) {}
+
+  @Input() set appRole(role: string) {
+
+    const user = this.authService.getCurrentUser();
+
+    if (user?.role === role) {
+      this.viewContainer.createEmbeddedView(this.templateRef);
+    } else {
+      this.viewContainer.clear();
+    }
   }
-
 }

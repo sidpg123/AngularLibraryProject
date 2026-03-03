@@ -1,1 +1,20 @@
-<p>books-list works!</p>
+<h2>Books</h2>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<div *ngIf="errorMessage" style="color:red">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="!isLoading && books.length === 0">
+  No books available.
+</div>
+
+<div *ngFor="let book of books">
+  <app-book-card
+    [book]="book"
+    (viewDetails)="onViewDetails($event)"
+    (issueBook)="onIssueBook($event)"
+    >
+  </app-book-card>
+</div>

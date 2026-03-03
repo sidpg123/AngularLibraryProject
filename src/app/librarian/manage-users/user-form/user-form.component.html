@@ -1,0 +1,46 @@
+<div style="background:white; padding:20px; width:450px; border-radius:6px;">
+
+  <h3>Edit User</h3>
+
+  <div *ngIf="errorMessage" style="color:red; margin-bottom:10px;">
+    {{ errorMessage }}
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:8px;">
+
+    <label>Full Name</label>
+    <input [(ngModel)]="formData.fullName" />
+
+    <label>Email</label>
+    <input [(ngModel)]="formData.email" />
+
+    <label>Phone</label>
+    <input [(ngModel)]="formData.phone" />
+
+    <label>Address</label>
+    <input [(ngModel)]="formData.address" />
+
+    <label>Role</label>
+    <select [(ngModel)]="formData.role">
+      <option value="user">User</option>
+      <option value="librarian">Librarian</option>
+    </select>
+
+    <label>Max Books Allowed</label>
+    <input type="number" [(ngModel)]="formData.maxBooksAllowed" />
+
+    <label>
+      <input type="checkbox" [(ngModel)]="formData.isActive" />
+      Active
+    </label>
+
+  </div>
+
+  <div style="margin-top:15px; display:flex; justify-content:space-between;">
+    <button (click)="submit()" [disabled]="isLoading">
+      {{ isLoading ? 'Saving...' : 'Save' }}
+    </button>
+    <button (click)="cancelled.emit()">Cancel</button>
+  </div>
+
+</div>

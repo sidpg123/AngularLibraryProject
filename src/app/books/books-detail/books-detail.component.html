@@ -1,1 +1,18 @@
-<p>books-detail works!</p>
+<div *ngIf="isLoading">Loading...</div>
+
+<div *ngIf="errorMessage" style="color:red">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="book">
+  <h2>{{ book.title }}</h2>
+  <p><strong>Category:</strong> {{ book.category }}</p>
+  <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+  <p><strong>Published:</strong> {{ book.publishedYear }}</p>
+  <p><strong>Description:</strong></p>
+  <p>{{ book.body }}</p>
+
+  <p><strong>Total Copies:</strong> {{ book.totalCopies }}</p>
+  <p><strong>Available:</strong> {{ book.availableCopies }}</p>
+  <p><strong>Issued:</strong> {{ book.issuedCopies }}</p>
+</div>

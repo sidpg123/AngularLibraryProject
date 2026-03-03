@@ -1,1 +1,8 @@
-<p>books-card works!</p>
+<div style="border:1px solid #ccc; padding:10px; margin:10px 0">
+  <h3>{{ book.title }}</h3>
+  <p><strong>Category:</strong> {{ book.category }}</p>
+  <p><strong>Available:</strong> {{ book.availableCopies }}</p>
+
+  <button (click)="onDetailsClick()">View Details</button>
+  <button *ngIf="isUserLoggedIn()" (click)="onIssueClick()">Issue Book</button>
+</div>

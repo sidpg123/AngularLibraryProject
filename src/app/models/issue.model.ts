@@ -24,6 +24,41 @@ export interface Issue {
   };
 }
 
+export interface CalculateFineResponse {
+  issueId: number;
+  dueDate: string; // ISO date string
+  gracePeriodDays: number;
+  overdueDays: number;
+  finePerDay: number;
+  calculatedFine: number;
+  maxFinePerBook: number;
+  isOverdue: boolean;
+  status: "overdue" | "returned" | "issued";
+}
+
+export interface BorrowResponse {
+  message: string;
+  issue: Issue;
+  book: {
+    id: number;
+    title: string;
+  };
+}
+
+export interface ReturnResponse {
+  message: string;
+  issue: Partial<Issue>;
+  fine: number;
+  hasFine: boolean;
+}
+
+export interface RenewResponse {
+  message: string;
+  issue: Issue;
+  newDueDate: string;
+  renewalsRemaining: number;
+}
+
 // Helper — compute these client-side, they are NOT returned by the server
 export function getDaysUntilDue(issue: Issue): number {
   const now = new Date();

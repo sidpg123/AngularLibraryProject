@@ -1,0 +1,57 @@
+<div style="background:white; padding:20px; width:450px; border-radius:6px;">
+
+  <h3>{{ isEditMode ? 'Edit Book' : 'Add New Book' }}</h3>
+
+  <div *ngIf="errorMessage" style="color:red; margin-bottom:10px;">
+    {{ errorMessage }}
+  </div>
+
+  <form [formGroup]="bookForm" (ngSubmit)="submit()">
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+
+      <!-- Title -->
+      <label>Title *</label>
+      <input formControlName="title" />
+      <small style="color:red" *ngIf="bookForm.get('title')?.touched && bookForm.get('title')?.invalid">
+        Title is required
+      </small>
+
+      <!-- Description -->
+      <label>Description *</label>
+      <textarea formControlName="body"></textarea>
+      <small style="color:red" *ngIf="bookForm.get('body')?.touched && bookForm.get('body')?.invalid">
+        Description is required
+      </small>
+
+      <!-- ISBN -->
+      <label>ISBN</label>
+      <input formControlName="isbn" />
+
+      <!-- Category -->
+      <label>Category</label>
+      <input formControlName="category" />
+
+      <!-- Published Year -->
+      <label>Published Year</label>
+      <input type="number" formControlName="publishedYear" />
+
+      <!-- Total Copies -->
+      <label>Total Copies</label>
+      <input type="number" formControlName="totalCopies" />
+      <small style="color:red" *ngIf="bookForm.get('totalCopies')?.touched && bookForm.get('totalCopies')?.invalid">
+        Must be at least 1 copy
+      </small>
+
+    </div>
+
+    <div style="margin-top:15px; display:flex; justify-content:space-between;">
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Saving...' : 'Save' }}
+      </button>
+      <button type="button" (click)="cancelled.emit()">Cancel</button>
+    </div>
+
+  </form>
+
+</div>

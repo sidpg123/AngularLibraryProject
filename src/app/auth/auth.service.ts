@@ -26,8 +26,15 @@ export class AuthService {
   private autoAuthenticate() {
     if (this.isLoggedIn()) {
       this.verifyToken().subscribe({
-        next: (res) => this.userSubject.next(res.user),
-        error: () => this.logout()
+        
+        next: (res) => {
+          console.log("Token verified successfully:", res);
+          this.userSubject.next(res.user)
+        },
+        error: (err) => {
+          console.error("Token verification failed:", err);
+          this.logout();
+        }
       });
     }
   }
@@ -45,7 +52,7 @@ export class AuthService {
   }
 
   private setSession(res: AuthResponse) {
-    
+    console.log('auth response:', res);
     if (res?.token) {
       localStorage.setItem(this.TOKEN_KEY, res.token);
       this.userSubject.next(res.user);
@@ -61,6 +68,10 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
+  getCurrentUser(): User | null {
+  return this.userSubject.value;
+}
 
   /**
    * Returns an observable so components can react to role changes.
@@ -82,6 +93,9 @@ export class AuthService {
   }
 
   verifyToken(): Observable<VerifyTokenResponse> {
-    return this.http.get<VerifyTokenResponse>(`${this.apiUrl}/auth/verify`);
+    console.log("Verifying token...")
+    const res =  this.http.get<VerifyTokenResponse>(`${this.apiUrl}/auth/verify`);
+    console.log("Verify token response:", res);
+    return res;
   }
 }
