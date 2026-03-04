@@ -1,74 +1,291 @@
-/* Container & Layout */
-form {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ============================================================
+   Login Component -- Warm Gray + Muted Indigo System
+   ============================================================ */
+
+/* ===== Page centering ===== */
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 170px);
+  padding: 30px 16px;
+  box-sizing: border-box;
 }
 
-div {
-  margin-bottom: 1.5rem;
+/* ===== Card (the form itself) ===== */
+form {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(60, 55, 45, 0.12);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin: 0 auto;
+  animation: cardIn 0.42s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Header band ===== */
+.form-header {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  background: var(--bg-hover);
+}
+
+.form-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.32);
+}
+
+.form-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.form-subtitle {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0;
+}
+
+/* ===== Body ===== */
+.form-body {
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ===== Server error banner ===== */
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 14px;
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  animation: shakeIn 0.3s ease;
+}
+
+.server-error-icon {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+
+body.dark-theme .server-error {
+  background: rgba(239, 68, 68, 0.10);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #f87171;
+}
+
+@keyframes shakeIn {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-5px); }
+  40%       { transform: translateX(5px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+
+/* ===== Field group ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
 }
 
 label {
-  display: block;
-  margin-bottom: 0.5rem;
+  font-size: 12.5px;
   font-weight: 600;
-  color: #333;
-}
-
-/* Input Fields */
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* Ensures padding doesn't affect width */
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-/* Angular Validation Classes */
-input.ng-invalid.ng-touched {
-  border-color: #dc3545;
-}
-
-/* Error Messages */
-span {
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   display: block;
-  color: #dc3545;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
+  margin: 0;
 }
 
-/* Submit Button */
-button {
+/* Input wrapper for icon */
+.input-wrap {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  line-height: 1;
+  transition: color 0.18s;
+}
+
+.input-wrap:focus-within .input-icon {
+  color: #6366f1;
+}
+
+/* ===== Inputs ===== */
+input[type="text"],
+input[type="password"] {
   width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 14px 11px 38px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+  background: var(--bg-secondary);
+}
+
+/* Angular invalid: custom class */
+input.is-invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Angular invalid: built-in fallback */
+input.ng-invalid.ng-touched {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+/* ===== Field validation errors ===== */
+.error-container {
+  margin: 0;
+  animation: fadeSlide 0.18s ease;
+}
+
+.error-container span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin: 0;
+}
+
+body.dark-theme .error-container span { color: #f87171; }
+
+.error-container span::before {
+  content: '\2022';
+  font-size: 14px;
+  line-height: 0.9;
+  flex-shrink: 0;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Submit button ===== */
+button[type="submit"] {
+  width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
   padding: 12px;
-  background-color: #007bff;
-  color: white;
+  border-radius: 10px;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  color: #fff;
   cursor: pointer;
-  transition: background-color 0.2s;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.32);
+  margin-top: 4px;
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.18s ease,
+    opacity 0.18s;
 }
 
-button:hover:not(:disabled) {
-  background-color: #0056b3;
+button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.42);
 }
 
-button:disabled {
-  background-color: #e0e0e0;
-  color: #a1a1a1;
+button[type="submit"]:active:not(:disabled) { transform: translateY(0); }
+
+button[type="submit"]:disabled {
+  opacity: 0.48;
   cursor: not-allowed;
-}   
+  transform: none;
+  box-shadow: none;
+}
+
+/* ===== Register link ===== */
+.register-row {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding-top: 2px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.register-row a {
+  color: #6366f1;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.register-row a:hover { opacity: 0.75; text-decoration: underline; }

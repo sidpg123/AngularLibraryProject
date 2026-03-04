@@ -1,53 +1,89 @@
-<form #loginForm="ngForm" (ngSubmit)="login(); loginForm.reset()">
-  <div class="form-group">
-    <label for="username">Username</label>
-    <input 
-      id="username"
-      type="text" 
-      name="username" 
-      [(ngModel)]="username" 
-      required 
-      minlength="3"
-      #formUsername="ngModel"
-      [class.is-invalid]="formUsername.invalid && formUsername.touched"
-    >
+<form #loginForm="ngForm" (ngSubmit)="login()">
 
-    @if (formUsername.invalid && formUsername.touched) {
-      <div class="error-container">
-        @if (formUsername.errors?.['required']) {
-          <span>Username field is required</span>
-        } @else if (formUsername.errors?.['minlength']) {
-          <span>Username must be at least 3 letters</span>
-        }
-      </div>
-    }
+  <!-- Header -->
+  <div class="form-header">
+    <div class="form-icon">📖</div>
+    <h2 class="form-title">Welcome back</h2>
+    <p class="form-subtitle">Sign in to your library account</p>
   </div>
 
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input 
-      id="password"
-      type="password" 
-      name="password" 
-      [(ngModel)]="password" 
-      required 
-      minlength="6"
-      #formPassword="ngModel"
-      [class.is-invalid]="formPassword.invalid && formPassword.touched"
-    >
+  <!-- Body -->
+  <div class="form-body">
 
-    @if (formPassword.invalid && formPassword.touched) {
-      <div class="error-container">
-        @if (formPassword.errors?.['required']) {
-          <span>Password field is required</span>
-        } @else if (formPassword.errors?.['minlength']) {
-          <span>Password must be at least 6 letters</span>
-        }
+    <!-- Server error -->
+    <div class="server-error" *ngIf="errMsg">
+      <span class="server-error-icon">!</span>
+      {{ errMsg }}
+    </div>
+
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          [(ngModel)]="username"
+          required
+          minlength="3"
+          #formUsername="ngModel"
+          [class.is-invalid]="formUsername.invalid && formUsername.touched"
+          placeholder="Enter your username"
+        />
       </div>
-    }
+
+      @if (formUsername.invalid && formUsername.touched) {
+        <div class="error-container">
+          @if (formUsername.errors?.['required']) {
+            <span>Username is required</span>
+          } @else if (formUsername.errors?.['minlength']) {
+            <span>Username must be at least 3 characters</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          #formPassword="ngModel"
+          [class.is-invalid]="formPassword.invalid && formPassword.touched"
+          placeholder="Enter your password"
+        />
+      </div>
+
+      @if (formPassword.invalid && formPassword.touched) {
+        <div class="error-container">
+          @if (formPassword.errors?.['required']) {
+            <span>Password is required</span>
+          } @else if (formPassword.errors?.['minlength']) {
+            <span>Password must be at least 6 characters</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" [disabled]="loginForm.invalid">
+      Sign In
+    </button>
+
+    <!-- Register link -->
+    <div class="register-row">
+      Don't have an account? <a routerLink="/auth/register">Create one</a>
+    </div>
+
   </div>
 
-  <button type="submit" [disabled]="loginForm.invalid">
-    Login
-  </button>
 </form>

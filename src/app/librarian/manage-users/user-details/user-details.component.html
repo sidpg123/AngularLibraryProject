@@ -1,82 +1,203 @@
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-<div *ngIf="errorMessage" style="color:red">
+<!-- ===== Loading ===== -->
+<div class="loading-wrap" *ngIf="isLoading">
+  <app-loading-spinner></app-loading-spinner>
+  <span class="loading-label">Loading user...</span>
+</div>
+
+<!-- ===== Error ===== -->
+<div class="error-banner" *ngIf="errorMessage && !isLoading">
   {{ errorMessage }}
 </div>
 
-<div *ngIf="user">
+<!-- ===== Detail Page ===== -->
+<div class="detail-page" *ngIf="user && !isLoading">
 
-  <h2>User Details</h2>
-
-  <p><strong>Username:</strong> {{ user.username }}</p>
-  <p><strong>Full Name:</strong> {{ user.fullName }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Phone:</strong> {{ user.phone }}</p>
-  <p><strong>Address:</strong> {{ user.address }}</p>
-  <p><strong>Role:</strong> {{ user.role }}</p>
-  <p>
-    <strong>Status:</strong>
-    <span [style.color]="user.isActive ? 'green' : 'red'">
-      {{ user.isActive ? 'Active' : 'Inactive' }}
-    </span>
-  </p>
-
-  <button (click)="openEdit()">Edit</button>
-  <button (click)="toggleActivation()">
-    {{ user.isActive ? 'Deactivate' : 'Activate' }}
+  <!-- Back -->
+  <button class="back-btn" (click)="goBack()">
+    <span class="back-arrow">&#8592;</span>
+    Back to Manage Users
   </button>
-  <button (click)="goBack()">Back</button>
 
-  <hr>
+  <!-- ===== Profile Card ===== -->
+  <div class="profile-card">
 
-  <h3>Borrowing Stats</h3>
+    <!-- Gradient hero band -->
+    <div class="profile-hero"></div>
 
-  <div *ngIf="stats">
-    <p>Total Borrowed: {{ stats.totalBorrowed }}</p>
-    <p>Currently Borrowed: {{ stats.currentlyBorrowed }}</p>
-    <p>Returned: {{ stats.returned }}</p>
-    <p>Overdue: {{ stats.overdue }}</p>
-    <p>Total Fines: ${{ stats.totalFines }}</p>
-    <p>Paid Fines: ${{ stats.paidFines }}</p>
+    <!-- Avatar + name + actions -->
+    <div class="profile-body">
+
+      <div class="profile-avatar">
+        {{ user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase() }}
+      </div>
+
+      <div class="profile-info">
+        <div class="profile-name">{{ user.fullName }}</div>
+        <div class="profile-meta">
+          <span class="profile-username">&#64;{{ user.username }}</span>
+          <span class="role-badge"
+            [class.librarian]="user.role === 'librarian'"
+            [class.user]="user.role === 'user'">
+            {{ user.role }}
+          </span>
+          <span class="status-badge"
+            [class.active]="user.isActive"
+            [class.inactive]="!user.isActive">
+            {{ user.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn-action btn-edit" (click)="openEdit()">
+          Edit
+        </button>
+        <button class="btn-action"
+          [class.btn-deactivate]="user.isActive"
+          [class.btn-activate]="!user.isActive"
+          (click)="toggleActivation()">
+          {{ user.isActive ? 'Deactivate' : 'Activate' }}
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Contact info row -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Email</span>
+        <span class="info-value" [class.empty]="!user.email">
+          {{ user.email || 'Not provided' }}
+        </span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Phone</span>
+        <span class="info-value" [class.empty]="!user.phone">
+          {{ user.phone || 'Not provided' }}
+        </span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Address</span>
+        <span class="info-value" [class.empty]="!user.address">
+          {{ user.address || 'Not provided' }}
+        </span>
+      </div>
+    </div>
+
   </div>
 
-  <hr>
+  <!-- ===== Borrowing Stats ===== -->
+  <div class="stats-section" *ngIf="stats">
+    <div class="section-heading">Borrowing Stats</div>
+    <div class="stats-grid">
 
-  <h3>Borrowing History</h3>
+      <div class="stat-card c-total">
+        <span class="stat-label">Total Borrowed</span>
+        <span class="stat-value">{{ stats.totalBorrowed }}</span>
+      </div>
 
-  <table border="1" cellpadding="8" cellspacing="0" width="100%">
-    <thead>
-      <tr>
-        <th>Book</th>
-        <th>Status</th>
-        <th>Issue Date</th>
-        <th>Due Date</th>
-        <th>Return Date</th>
-      </tr>
-    </thead>
+      <div class="stat-card c-current">
+        <span class="stat-label">Currently Borrowed</span>
+        <span class="stat-value">{{ stats.currentlyBorrowed }}</span>
+      </div>
 
-    <tbody>
-      <tr *ngFor="let issue of issues">
-        <td>{{ issue.book?.title }}</td>
-        <td>{{ issue.status }}</td>
-        <td>{{ issue.issueDate | date }}</td>
-        <td>{{ issue.dueDate | date }}</td>
-        <td>{{ issue.returnDate | date }}</td>
-      </tr>
-    </tbody>
-  </table>
+      <div class="stat-card c-returned">
+        <span class="stat-label">Returned</span>
+        <span class="stat-value">{{ stats.returned }}</span>
+      </div>
+
+      <div class="stat-card c-overdue">
+        <span class="stat-label">Overdue</span>
+        <span class="stat-value">{{ stats.overdue }}</span>
+      </div>
+
+      <div class="stat-card c-fines">
+        <span class="stat-label">Total Fines</span>
+        <span class="stat-value">${{ stats.totalFines }}</span>
+      </div>
+
+      <div class="stat-card c-paid">
+        <span class="stat-label">Paid Fines</span>
+        <span class="stat-value">${{ stats.paidFines }}</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Borrowing History ===== -->
+  <div class="history-section">
+    <div class="section-heading">Borrowing History</div>
+
+    <div class="table-container">
+      <table class="history-table">
+
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Status</th>
+            <th>Issued</th>
+            <th>Due</th>
+            <th>Returned</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let issue of issues">
+
+            <td class="book-title-cell">
+              <span class="book-title-text" [title]="issue.book?.title">
+                {{ issue.book?.title || 'Unknown Book' }}
+              </span>
+            </td>
+
+            <td>
+              <span class="issue-status"
+                [class.returned]="issue.status === 'returned'"
+                [class.issued]="issue.status === 'issued'"
+                [class.overdue]="issue.status === 'overdue'">
+                {{ issue.status }}
+              </span>
+            </td>
+
+            <td class="date-cell">{{ issue.issueDate | date:'MMM d, yyyy' }}</td>
+
+            <td class="date-cell"
+              [class.empty]="!issue.dueDate">
+              {{ issue.dueDate ? (issue.dueDate | date:'MMM d, yyyy') : '&mdash;' }}
+            </td>
+
+            <td class="date-cell"
+              [class.empty]="!issue.returnDate">
+              {{ issue.returnDate ? (issue.returnDate | date:'MMM d, yyyy') : '&mdash;' }}
+            </td>
+
+          </tr>
+
+          <!-- Empty -->
+          <tr *ngIf="issues.length === 0">
+            <td colspan="5">
+              <div class="empty-history">
+                <span class="empty-history-title">No borrowing history</span>
+                <span class="empty-history-sub">This user has not borrowed any books yet</span>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
 
-<!-- Edit Modal -->
-<div *ngIf="showEditModal"
-     style="position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(0,0,0,0.5);
-            display:flex; justify-content:center; align-items:center;">
-
-  <app-user-form
-    [user]="user!"
-    (saved)="onUserUpdated()"
-    (cancelled)="closeEdit()">
-  </app-user-form>
-
+<!-- ===== Edit Modal ===== -->
+<div class="modal-backdrop" *ngIf="showEditModal" (click)="closeEdit()">
+  <div class="modal-inner" (click)="$event.stopPropagation()">
+    <app-user-form
+      [user]="user!"
+      (saved)="onUserUpdated()"
+      (cancelled)="closeEdit()">
+    </app-user-form>
+  </div>
 </div>

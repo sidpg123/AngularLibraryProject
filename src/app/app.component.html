@@ -1,41 +1,127 @@
-<nav style="padding: 10px; border-bottom: 1px solid #ccc; display: flex; gap: 15px; align-items: center;">
-  
-  <!-- Always visible -->
-  <a routerLink="/">Home</a>
-  <a routerLink="/books">Books</a>
+<div class="app-layout">
 
-  <!-- Use async pipe once -->
-  <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+  <!-- Sidebar: hidden on landing route -->
+  <aside class="sidebar" [class.open]="isSidebarOpen" *ngIf="!isLanding">
 
-    <!-- Logged-in links -->
-    <a routerLink="/my-books">My Books</a>
+    <div class="sidebar-header">
+      <a class="brand" routerLink="/">
+        <span class="brand-icon"></span>
+        LibraryMS
+      </a>
+      <button class="close-btn" (click)="closeSidebar()">&#10005;</button>
+    </div>
 
-    <a *ngIf="user.role === 'librarian'" routerLink="/librarian/dashboard">
-      Librarian Dashboard
-    </a>
-    <a *ngIf="user.role === 'librarian'" routerLink="/librarian/manage-books">
-      Manage Books
-    </a>
-    <a *ngIf="user.role === 'librarian'" routerLink="/librarian/manage-users">
-      Manage Users
-    </a>
+    <nav class="sidebar-nav">
 
-    <span style="margin-left:auto;">
-      Welcome, {{ user.fullName }}
-    </span>
+      <ng-container *ngIf="currentUser$ | async as user; else guestNav">
 
-    <button (click)="logout()">Logout</button>
+        <ng-container *ngIf="user.role === 'user'">
+          <a routerLink="/books" routerLinkActive="active" (click)="closeSidebar()">
+            <span class="nav-icon">📖</span>
+            <span class="nav-label">Books</span>
 
-  </ng-container>
+          </a>
+          <a routerLink="/my-books" routerLinkActive="active" (click)="closeSidebar()">
+            <span class="nav-icon">🔖</span>
+            <span class="nav-label">My Books</span>
+          </a>
 
-  <!-- Guest links -->
-  <ng-template #guestLinks>
-    <span style="margin-left:auto;"></span>
-    <a routerLink="/auth/login">Login</a>
-    <a routerLink="/auth/register">Register</a>
-  </ng-template>
+          <a routerLink="/profile" routerLinkActive="active">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">My Profile</span>
+          </a>
+        </ng-container>
 
-</nav>
+        <ng-container *ngIf="user.role === 'librarian'">
+          <div class="sidebar-section">Librarian</div>
+          <a routerLink="/librarian/dashboard" routerLinkActive="active" (click)="closeSidebar()">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Dashboard</span>
+          </a>
+          <a routerLink="/librarian/manage-books" routerLinkActive="active" (click)="closeSidebar()">
+            <span class="nav-icon">🗂️</span>
+            <span class="nav-label">Manage Books</span>
+          </a>
+          <a routerLink="/librarian/manage-users" routerLinkActive="active" (click)="closeSidebar()">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">Manage Users</span>
+          </a>
+        </ng-container>
 
-<!-- Router outlet -->
-<router-outlet></router-outlet>
+      </ng-container>
+
+      <ng-template #guestNav>
+        <a routerLink="/books" routerLinkActive="active" (click)="closeSidebar()">
+          <span class="nav-icon">📖</span>
+          <span class="nav-label">Books</span>
+        </a>
+      </ng-template>
+
+    </nav>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="backdrop" *ngIf="isSidebarOpen && !isLanding" (click)="closeSidebar()"></div>
+
+  <!-- Content area -->
+  <div class="content-area" [class.landing-layout]="isLanding">
+
+    <header class="topbar">
+
+      <!-- Hamburger: only when sidebar exists -->
+      <button class="menu-btn" *ngIf="!isLanding" (click)="toggleSidebar()">
+        <span class="menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+
+      <!-- Brand in topbar only on landing -->
+      <a routerLink="/" class="topbar-brand" *ngIf="isLanding">
+        <span class="topbar-brand-icon">📚</span>
+        LibraryMS
+      </a>
+
+      <div class="topbar-right">
+
+        <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+          <div class="user-info">
+            <div class="user-avatar">
+              {{ user.fullName?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div class="user-text">
+              <span class="welcome-text">Welcome back</span>
+              <span class="user-name">{{ user.fullName }}</span>
+            </div>
+          </div>
+          <span class="topbar-sep"></span>
+          <button class="btn btn-outline" (click)="logout()">Logout</button>
+        </ng-container>
+
+        <ng-template #guestLinks>
+          <a routerLink="/auth/login" class="btn btn-outline">Login</a>
+          <a routerLink="/auth/register" class="btn btn-primary">Register</a>
+        </ng-template>
+
+        <span class="topbar-sep"></span>
+
+        <button class="theme-toggle" (click)="toggleTheme()"
+          [attr.aria-label]="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+          <span class="toggle-track" [class.dark]="isDark">
+            <span class="toggle-thumb">
+              <span class="toggle-icon">{{ isDark ? '🌙' : '☀️' }}</span>
+            </span>
+          </span>
+        </button>
+
+      </div>
+    </header>
+
+    <main class="main-content" [class.landing-main]="isLanding">
+      <router-outlet></router-outlet>
+      <app-confirm-dialog-host> </app-confirm-dialog-host>
+    </main>
+
+  </div>
+</div>

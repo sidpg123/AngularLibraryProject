@@ -1,46 +1,118 @@
-<div style="background:white; padding:20px; width:450px; border-radius:6px;">
+<div class="form-card">
 
-  <h3>Edit User</h3>
-
-  <div *ngIf="errorMessage" style="color:red; margin-bottom:10px;">
-    {{ errorMessage }}
+  <!-- ===== Header ===== -->
+  <div class="form-header">
+    <div class="form-header-left">
+      <div class="form-icon">U</div>
+      <div>
+        <div class="form-title">Edit User</div>
+        <div class="form-subtitle">Update member details</div>
+      </div>
+    </div>
+    <button class="form-close-btn" type="button" (click)="cancelled.emit()">&#10005;</button>
   </div>
 
-  <div style="display:flex; flex-direction:column; gap:8px;">
+  <!-- ===== Body ===== -->
+  <div class="form-body">
 
-    <label>Full Name</label>
-    <input [(ngModel)]="formData.fullName" />
+    <!-- Error -->
+    <div class="form-error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-    <label>Email</label>
-    <input [(ngModel)]="formData.email" />
+    <!-- Personal Info -->
+    <div class="form-section-label">Personal Info</div>
 
-    <label>Phone</label>
-    <input [(ngModel)]="formData.phone" />
+    <!-- Full Name + Email -->
+    <div class="form-row">
+      <div class="field-group">
+        <label class="field-label">
+          Full Name <span class="field-required">*</span>
+        </label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="formData.fullName"
+          placeholder="e.g. Jane Doe"
+        />
+      </div>
+      <div class="field-group">
+        <label class="field-label">
+          Email <span class="field-required">*</span>
+        </label>
+        <input
+          class="field-input"
+          type="email"
+          [(ngModel)]="formData.email"
+          placeholder="jane@example.com"
+        />
+      </div>
+    </div>
 
-    <label>Address</label>
-    <input [(ngModel)]="formData.address" />
+    <!-- Phone + Address -->
+    <div class="form-row">
+      <div class="field-group">
+        <label class="field-label">Phone</label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="formData.phone"
+          placeholder="+1 555 000 0000"
+        />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Address</label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="formData.address"
+          placeholder="123 Main St"
+        />
+      </div>
+    </div>
 
-    <label>Role</label>
-    <select [(ngModel)]="formData.role">
-      <option value="user">User</option>
-      <option value="librarian">Librarian</option>
-    </select>
+    <!-- Account Settings -->
+    <div *ngIf="!isUser()" class="form-section-label" style="margin-top: 4px;">Account Settings</div>
 
-    <label>Max Books Allowed</label>
-    <input type="number" [(ngModel)]="formData.maxBooksAllowed" />
+    <!-- Role + Max Books -->
+    <div *ngIf="!isUser()" class="form-row">
+      <div class="field-group">
+        <label class="field-label">Role</label>
+        <select class="field-select" [(ngModel)]="formData.role">
+          <option value="user">User</option>
+          <option value="librarian">Librarian</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Max Books Allowed</label>
+        <input
+          class="field-input"
+          type="number"
+          [(ngModel)]="formData.maxBooksAllowed"
+          min="1"
+          placeholder="3"
+        />
+      </div>
+    </div>
 
-    <label>
-      <input type="checkbox" [(ngModel)]="formData.isActive" />
-      Active
+    <!-- Active toggle -->
+    <label *ngIf="!isUser()" class="checkbox-group">
+      <input
+        class="checkbox-input"
+        type="checkbox"
+        [(ngModel)]="formData.isActive"
+      />
+      <span class="checkbox-label">Active account</span>
+      <span class="checkbox-desc">User can log in and borrow books</span>
     </label>
 
   </div>
 
-  <div style="margin-top:15px; display:flex; justify-content:space-between;">
-    <button (click)="submit()" [disabled]="isLoading">
-      {{ isLoading ? 'Saving...' : 'Save' }}
+  <!-- ===== Footer ===== -->
+  <div class="form-footer">
+    <button class="btn-cancel" type="button" (click)="cancelled.emit()">Cancel</button>
+    <button class="btn-save" type="button" (click)="submit()" [disabled]="isLoading">
+      <span class="btn-spinner" *ngIf="isLoading"></span>
+      {{ isLoading ? 'Saving...' : 'Save Changes' }}
     </button>
-    <button (click)="cancelled.emit()">Cancel</button>
   </div>
 
 </div>

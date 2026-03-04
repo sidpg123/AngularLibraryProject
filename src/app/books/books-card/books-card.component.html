@@ -1,8 +1,89 @@
-<div style="border:1px solid #ccc; padding:10px; margin:10px 0">
-  <h3>{{ book.title }}</h3>
-  <p><strong>Category:</strong> {{ book.category }}</p>
-  <p><strong>Available:</strong> {{ book.availableCopies }}</p>
+<div class="book-card" [style.--card-index]="index">
 
-  <button (click)="onDetailsClick()">View Details</button>
-  <button *ngIf="isUserLoggedIn()" (click)="onIssueClick()">Issue Book</button>
+  <!-- ===== Cover ===== -->
+  <div class="card-cover">
+
+    <img
+      *ngIf="book.coverImage; else noCover"
+      [src]="book.coverImage"
+      [alt]="book.title"
+      class="cover-img"
+    />
+
+    <ng-template #noCover>
+      <div class="cover-placeholder">
+        <span class="placeholder-icon">{{ book.title?.charAt(0)?.toUpperCase() }}</span>
+        <span class="placeholder-label">No Cover</span>
+      </div>
+    </ng-template>
+
+    <!-- Availability ribbon -->
+    <span class="avail-ribbon"
+      [class.available]="book.availableCopies > 1"
+      [class.low]="book.availableCopies === 1"
+      [class.unavailable]="book.availableCopies === 0">
+      {{ book.availableCopies === 0 ? 'Unavailable' : book.availableCopies === 1 ? 'Last Copy' : 'Available' }}
+    </span>
+
+  </div>
+
+  <!-- ===== Body ===== -->
+  <div class="card-body">
+
+    <span class="card-category">{{ book.category }}</span>
+
+    <h3 class="card-title">{{ book.title }}</h3>
+
+    <p class="card-desc" *ngIf="book.body">{{ book.body | truncate:80}}</p>
+
+    <!-- Meta -->
+    <div class="card-meta">
+
+      <div class="meta-item">
+        <span class="meta-label">Year</span>
+        <span class="meta-value">{{ book.publishedYear }}</span>
+      </div>
+
+      <div class="meta-item">
+        <span class="meta-label">Copies</span>
+        <span class="meta-value"
+          [class.available-ok]="book.availableCopies / book.totalCopies >= 0.3"
+          [class.available-low]="book.availableCopies > 0 && book.availableCopies / book.totalCopies < 0.3"
+          [class.available-zero]="book.availableCopies === 0">
+          {{ book.availableCopies }}/{{ book.totalCopies }}
+        </span>
+      </div>
+
+      <!-- Mini availability bar -->
+      <div class="avail-bar-wrap" *ngIf="book.totalCopies > 0">
+        <div class="avail-bar-track">
+          <div class="avail-bar-fill"
+            [class.low]="book.availableCopies > 0 && book.availableCopies / book.totalCopies < 0.3"
+            [class.none]="book.availableCopies === 0"
+            [style.width.%]="book.availableCopies / book.totalCopies * 100">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <div class="card-footer">
+
+    <button class="btn-card btn-view" (click)="onDetailsClick()">
+      Details
+    </button>
+
+    <button
+      class="btn-card btn-issue"
+      *ngIf="isUserLoggedIn()"
+      [disabled]="book.availableCopies === 0"
+      (click)="onIssueClick()">
+      {{ book.availableCopies === 0 ? 'Unavailable' : 'Borrow' }}
+    </button>
+
+  </div>
+
 </div>

@@ -1,57 +1,134 @@
-<div style="background:white; padding:20px; width:450px; border-radius:6px;">
+<div class="form-card">
 
-  <h3>{{ isEditMode ? 'Edit Book' : 'Add New Book' }}</h3>
-
-  <div *ngIf="errorMessage" style="color:red; margin-bottom:10px;">
-    {{ errorMessage }}
+  <!-- ===== Header ===== -->
+  <div class="form-header">
+    <div class="form-header-left">
+      <div class="form-icon">{{ isEditMode ? '✏️' : '📖' }}</div>
+      <div>
+        <div class="form-title">{{ isEditMode ? 'Edit Book' : 'Add New Book' }}</div>
+        <div class="form-subtitle">{{ isEditMode ? 'Update book details' : 'Fill in the book information' }}</div>
+      </div>
+    </div>
+    <button class="form-close-btn" type="button" (click)="cancelled.emit()">✕</button>
   </div>
 
-  <form [formGroup]="bookForm" (ngSubmit)="submit()">
+  <!-- ===== Body ===== -->
+  <div class="form-body">
 
-    <div style="display:flex; flex-direction:column; gap:10px;">
+    <!-- Error Banner -->
+    <div class="form-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <form [formGroup]="bookForm" (ngSubmit)="submit()" id="bookForm">
 
       <!-- Title -->
-      <label>Title *</label>
-      <input formControlName="title" />
-      <small style="color:red" *ngIf="bookForm.get('title')?.touched && bookForm.get('title')?.invalid">
-        Title is required
-      </small>
+      <div class="field-group">
+        <label class="field-label">
+          Title <span class="field-required">*</span>
+        </label>
+        <input
+          class="field-input"
+          [class.invalid]="bookForm.get('title')?.touched && bookForm.get('title')?.invalid"
+          formControlName="title"
+          placeholder="e.g. The Great Gatsby"
+          type="text"
+        />
+        <span class="field-error"
+          *ngIf="bookForm.get('title')?.touched && bookForm.get('title')?.invalid">
+          Title is required
+        </span>
+      </div>
 
       <!-- Description -->
-      <label>Description *</label>
-      <textarea formControlName="body"></textarea>
-      <small style="color:red" *ngIf="bookForm.get('body')?.touched && bookForm.get('body')?.invalid">
-        Description is required
-      </small>
+      <div class="field-group" style="margin-top: 18px;">
+        <label class="field-label">
+          Description <span class="field-required">*</span>
+        </label>
+        <textarea
+          class="field-textarea"
+          [class.invalid]="bookForm.get('body')?.touched && bookForm.get('body')?.invalid"
+          formControlName="body"
+          placeholder="Brief description of the book…"
+          rows="3">
+        </textarea>
+        <span class="field-error"
+          *ngIf="bookForm.get('body')?.touched && bookForm.get('body')?.invalid">
+          Description is required
+        </span>
+      </div>
 
-      <!-- ISBN -->
-      <label>ISBN</label>
-      <input formControlName="isbn" />
+      <!-- ISBN + Category -->
+      <div class="form-row" style="margin-top: 18px;">
 
-      <!-- Category -->
-      <label>Category</label>
-      <input formControlName="category" />
+        <div class="field-group">
+          <label class="field-label">ISBN</label>
+          <input
+            class="field-input"
+            formControlName="isbn"
+            placeholder="978-3-16-148410-0"
+            type="text"
+          />
+        </div>
 
-      <!-- Published Year -->
-      <label>Published Year</label>
-      <input type="number" formControlName="publishedYear" />
+        <div class="field-group">
+          <label class="field-label">Category</label>
+          <input
+            class="field-input"
+            formControlName="category"
+            placeholder="e.g. Fiction"
+            type="text"
+          />
+        </div>
 
-      <!-- Total Copies -->
-      <label>Total Copies</label>
-      <input type="number" formControlName="totalCopies" />
-      <small style="color:red" *ngIf="bookForm.get('totalCopies')?.touched && bookForm.get('totalCopies')?.invalid">
-        Must be at least 1 copy
-      </small>
+      </div>
 
-    </div>
+      <!-- Published Year + Total Copies -->
+      <div class="form-row" style="margin-top: 18px;">
 
-    <div style="margin-top:15px; display:flex; justify-content:space-between;">
-      <button type="submit" [disabled]="isLoading">
-        {{ isLoading ? 'Saving...' : 'Save' }}
-      </button>
-      <button type="button" (click)="cancelled.emit()">Cancel</button>
-    </div>
+        <div class="field-group">
+          <label class="field-label">Published Year</label>
+          <input
+            class="field-input"
+            formControlName="publishedYear"
+            placeholder="e.g. 1984"
+            type="number"
+          />
+        </div>
 
-  </form>
+        <div class="field-group">
+          <label class="field-label">Total Copies</label>
+          <input
+            class="field-input"
+            [class.invalid]="bookForm.get('totalCopies')?.touched && bookForm.get('totalCopies')?.invalid"
+            formControlName="totalCopies"
+            placeholder="1"
+            type="number"
+            min="1"
+          />
+          <span class="field-error"
+            *ngIf="bookForm.get('totalCopies')?.touched && bookForm.get('totalCopies')?.invalid">
+            Must be at least 1
+          </span>
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <div class="form-footer">
+    <button class="btn-cancel" type="button" (click)="cancelled.emit()">
+      Cancel
+    </button>
+    <button
+      class="btn-save"
+      type="submit"
+      form="bookForm"
+      [disabled]="isLoading">
+      <span class="btn-spinner" *ngIf="isLoading"></span>
+      {{ isLoading ? 'Saving…' : (isEditMode ? 'Update Book' : 'Add Book') }}
+    </button>
+  </div>
 
 </div>

@@ -8,18 +8,19 @@ import { BookService } from '../../../books/book.service';
   selector: 'app-book-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './book-form.component.html'
+  templateUrl: './book-form.component.html',
+  styleUrl: './book-form.component.css'          
 })
 export class BookFormComponent implements OnInit, OnChanges {
 
   @Input() book: Book | null = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved     = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
   bookForm!: FormGroup;
-  isEditMode = false;
+  isEditMode   = false;
   errorMessage = '';
-  isLoading = false;
+  isLoading    = false;
 
   constructor(
     private fb: FormBuilder,
@@ -44,12 +45,12 @@ export class BookFormComponent implements OnInit, OnChanges {
 
   initializeForm(): void {
     this.bookForm = this.fb.group({
-      title: ['', Validators.required],
-      body: ['', Validators.required],
-      isbn: [''],
-      category: [''],
+      title:         ['', Validators.required],
+      body:          ['', Validators.required],
+      isbn:          [''],
+      category:      [''],
       publishedYear: [''],
-      totalCopies: [1, [Validators.min(1)]]
+      totalCopies:   [1, [Validators.min(1)]]
     });
 
     if (this.book) {
@@ -59,41 +60,31 @@ export class BookFormComponent implements OnInit, OnChanges {
   }
 
   submit(): void {
-
     if (this.bookForm.invalid) {
       this.bookForm.markAllAsTouched();
       return;
     }
 
-    this.isLoading = true;
-    const payload = this.bookForm.value;
+    this.isLoading    = true;
+    this.errorMessage = '';
+    const payload     = this.bookForm.value;
 
     if (this.isEditMode && this.book) {
-
       this.bookService.updateBook(String(this.book.id), payload).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.saved.emit();
-        },
+        next:  () => { this.isLoading = false; this.saved.emit(); },
         error: (err) => {
           this.errorMessage = err?.error?.error || 'Update failed';
           this.isLoading = false;
         }
       });
-
     } else {
-
       this.bookService.createBook(payload).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.saved.emit();
-        },
+        next:  () => { this.isLoading = false; this.saved.emit(); },
         error: (err) => {
           this.errorMessage = err?.error?.error || 'Creation failed';
           this.isLoading = false;
         }
       });
-
     }
   }
 }

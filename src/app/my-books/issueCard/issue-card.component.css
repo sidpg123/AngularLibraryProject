@@ -1,0 +1,257 @@
+/* ============================================================
+   Issue Card Component &#8212; Warm Gray + Muted Indigo System
+   ============================================================ */
+
+.issue-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  transition: transform 0.22s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.22s ease, border-color 0.18s;
+  position: relative;
+
+  animation: cardIn 0.42s cubic-bezier(0.4,0,0.2,1) both;
+  animation-delay: calc(var(--card-index, 0) * 55ms);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.issue-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+
+/* Left status stripe */
+.status-stripe {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--stripe-color, var(--border));
+}
+
+.issue-card.status-issued   { --stripe-color: #6366f1; }
+.issue-card.status-overdue  { --stripe-color: #ef4444; }
+.issue-card.status-returned { --stripe-color: #10b981; }
+
+/* ===== Card Body ===== */
+.card-body {
+  flex: 1;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ===== Book Info ===== */
+.book-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.book-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status pill inline with title */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+.status-pill::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-pill.issued {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.status-pill.issued::before {
+  background: var(--accent);
+}
+
+.status-pill.overdue {
+  background: rgba(239,68,68,0.10);
+  color: #ef4444;
+  animation: overduePulse 2s ease infinite;
+}
+.status-pill.overdue::before {
+  background: #ef4444;
+  animation: dotPulse 2s ease infinite;
+}
+
+.status-pill.returned {
+  background: rgba(16,185,129,0.10);
+  color: #10b981;
+}
+.status-pill.returned::before {
+  background: #10b981;
+}
+
+@keyframes overduePulse {
+  0%, 100% { background: rgba(239,68,68,0.10); }
+  50%       { background: rgba(239,68,68,0.16); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+  50%       { box-shadow: 0 0 0 3px rgba(239,68,68,0); }
+}
+
+/* Date row */
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.date-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.date-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.date-value {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+.date-value.overdue-date { color: #ef4444; font-weight: 600; }
+
+.date-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border-soft);
+  align-self: center;
+}
+
+/* Renewal tag */
+.renewal-tag {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  padding: 2px 9px;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+.renewal-tag.maxed { color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+
+/* ===== Right Side: Fine + Action ===== */
+.card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 2px 0;
+}
+
+/* Fine badge */
+.fine-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.fine-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.fine-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ef4444;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.fine-amount.zero { color: var(--text-muted); font-size: 14px; }
+
+/* Details button */
+.btn-details {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-details:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 560px) {
+  .card-body { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .card-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; padding: 0; }
+  .fine-badge { flex-direction: row; align-items: center; gap: 6px; }
+  .date-row { gap: 10px; }
+}

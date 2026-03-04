@@ -93,9 +93,13 @@ export class AuthService {
   }
 
   verifyToken(): Observable<VerifyTokenResponse> {
-    console.log("Verifying token...")
+    // console.log("Verifying token...")
     const res =  this.http.get<VerifyTokenResponse>(`${this.apiUrl}/auth/verify`);
-    console.log("Verify token response:", res);
+    // console.log("Verify token response:", res);
     return res;
+  }
+
+  profile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/auth/profile`);
   }
 }

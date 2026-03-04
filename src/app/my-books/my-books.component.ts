@@ -7,13 +7,16 @@ import { IssueCardComponent } from './issueCard/issue-card.component';
 import { AuthService } from '../auth/auth.service';
 import { FineService } from './fine.service';
 import { FineCalculationPreview, UserFineSummary } from '../models/fine.model';
-import { LoadingSpinnerComponent } from "../shared/loading.component";
+import { LoadingSpinnerComponent } from '../shared/loading.component';
+import { IssueCountPipe } from '../shared/issue-count.pipe';
+import { ConfirmDialogService } from '../shared/confirm/confirm-dialog-host/confirm-dialogue.service';
 
 @Component({
   selector: 'app-my-books',
   standalone: true,
-  imports: [CommonModule, IssueCardComponent, LoadingSpinnerComponent],
-  templateUrl: './my-books.component.html'
+  imports: [CommonModule, IssueCardComponent, LoadingSpinnerComponent, IssueCountPipe],
+  templateUrl: './my-books.component.html',
+  styleUrl: './my-books.component.css'
 })
 export class MyBooksComponent implements OnInit {
 
@@ -21,12 +24,12 @@ export class MyBooksComponent implements OnInit {
   filteredIssues: Issue[] = [];
 
   fineSummary?: UserFineSummary;
-  fineLoading = false;
-  fineError = '';
+  fineLoading  = false;
+  fineError    = '';
   calculatedFines: { [issueId: number]: FineCalculationPreview } = {};
   selectedStatus: 'all' | 'issued' | 'overdue' | 'returned' = 'all';
 
-  isLoading = false;
+  isLoading    = false;
   errorMessage = '';
 
   constructor(
@@ -34,7 +37,8 @@ export class MyBooksComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private fineService: FineService,
-  ) { }
+    private confirm: ConfirmDialogService
+  ) {}
 
   ngOnInit(): void {
     this.loadIssues();
@@ -43,7 +47,6 @@ export class MyBooksComponent implements OnInit {
 
   loadIssues(): void {
     this.isLoading = true;
-
     this.issueService.getAllIssues().subscribe({
       next: (res) => {
         this.issues = res;
@@ -59,18 +62,18 @@ export class MyBooksComponent implements OnInit {
   }
 
   applyFilter(): void {
-    if (this.selectedStatus === 'all') {
-      this.filteredIssues = this.issues;
-    } else {
-      this.filteredIssues = this.issues.filter(
-        issue => issue.status === this.selectedStatus
-      );
-    }
+    this.filteredIssues = this.selectedStatus === 'all'
+      ? this.issues
+      : this.issues.filter(i => i.status === this.selectedStatus);
   }
 
   changeFilter(status: any): void {
     this.selectedStatus = status;
     this.applyFilter();
+  }
+
+  countByStatus(status: string): number {
+    return this.issues.filter(i => i.status === status).length;
   }
 
   openDetails(issueId: number): void {
@@ -80,54 +83,53 @@ export class MyBooksComponent implements OnInit {
   loadFineSummary(): void {
     const user = this.authService.getCurrentUser();
     if (!user) return;
-
     this.fineLoading = true;
-
     this.fineService.getUserFineSummary(user.id).subscribe({
-      next: (res) => {
-        this.fineSummary = res;
-        this.fineLoading = false;
-      },
-      error: (err) => {
-        this.fineError = err?.error?.error || 'Failed to load fines';
-        this.fineLoading = false;
-      }
+      next: (res) => { this.fineSummary = res; this.fineLoading = false; },
+      error: (err) => { this.fineError = err?.error?.error || 'Failed to load fines'; this.fineLoading = false; }
     });
   }
 
-  payAllFines(): void {
-    const user = this.authService.getCurrentUser();
-    if (!user) return;
+ payAllFines(): void {
 
-    if (!confirm('Pay all outstanding fines?')) return;
+  const user = this.authService.getCurrentUser();
+  if (!user) return;
 
-    this.fineLoading = true;
+  this.confirm
+    .open(
+      'Pay All Fines',
+      'Are you sure you want to pay all outstanding fines?'
+    )
+    .subscribe(result => {
 
-    this.fineService.payAllFines(user.id).subscribe({
-      next: () => {
-        this.loadFineSummary();
-        this.loadIssues();
-        this.fineLoading = false;
-      },
-      error: (err) => {
-        this.fineError = err?.error?.error;
-        this.fineLoading = false;
-      }
+      if (!result) return;
+
+      this.fineLoading = true;
+
+      this.fineService.payAllFines(user.id).subscribe({
+        next: () => {
+          this.loadFineSummary();
+          this.loadIssues();
+          this.fineLoading = false;
+        },
+        error: (err) => {
+          this.fineError = err?.error?.error;
+          this.fineLoading = false;
+        }
+      });
+
     });
-  }
+
+}
 
   loadCalculatedFines(): void {
-    this.issues
-      .forEach(issue => {
-
-        this.fineService.calculateFine(issue.id).subscribe({
-          next: (preview) => {
-            this.calculatedFines = { ...this.calculatedFines, [issue.id]: preview };
-          },
-          error: () => {
-          }
-        });
-
+    this.issues.forEach(issue => {
+      this.fineService.calculateFine(issue.id).subscribe({
+        next: (preview) => {
+          this.calculatedFines = { ...this.calculatedFines, [issue.id]: preview };
+        },
+        error: () => {}
       });
+    });
   }
 }

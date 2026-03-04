@@ -10,7 +10,10 @@ export const authRedirectGuard: CanActivateFn = (route, state) => {
   return authService.currentUser$.pipe(
   take(1),
   map(user => {
-    if (user) {
+    if(user?.role === 'librarian') {
+      return router.createUrlTree(['/librarian/dashboard']);
+    }
+    else if (user?.role === 'user') {
       return router.createUrlTree(['/books']);
     }
     return true;

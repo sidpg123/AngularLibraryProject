@@ -1,68 +1,189 @@
-<h2>Manage Books</h2>
+<div class="manage-page">
 
-<div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-    <h2>Manage Books</h2>
-    <button (click)="openCreateForm()">➕ Add Book</button>
-</div>
+  <!-- ===== Page Header ===== -->
+  <div class="page-header">
+    <h2 class="page-title">
+      Manage Books
+      <span>{{ books.length }} books in collection</span>
+    </h2>
+    <button class="btn-add" (click)="openCreateForm()">
+      <span class="btn-add-icon">＋</span>
+      Add Book
+    </button>
+  </div>
 
-<!-- Controls -->
-<div style="margin-bottom:15px; display:flex; gap:10px;">
+  <!-- ===== Controls ===== -->
+  <div class="controls-row">
 
-    <!-- Search -->
-    <input type="text" placeholder="Search by title, ISBN, category" [(ngModel)]="searchTerm" />
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search by title, ISBN or category…"
+        [(ngModel)]="searchTerm"
+      />
+    </div>
 
-    <!-- Category Filter -->
-    <select [(ngModel)]="selectedCategory">
-        <option value="all">All Categories</option>
-        <option *ngFor="let category of categories" [value]="category">
-            {{ category }}
-        </option>
+    <select class="category-select" [(ngModel)]="selectedCategory">
+      <option value="all">All Categories</option>
+      <option *ngFor="let category of categories" [value]="category">
+        {{ category }}
+      </option>
     </select>
 
-</div>
+  </div>
 
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-<div *ngIf="errorMessage" style="color:red">
+  <!-- ===== Loading ===== -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+    <span class="loading-label">Loading books…</span>
+  </div>
+
+  <!-- ===== Error ===== -->
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">
     {{ errorMessage }}
+  </div>
+
+  <!-- ===== Table ===== -->
+  <ng-container *ngIf="!isLoading">
+
+    <!-- Results bar -->
+    <div class="results-bar">
+      <span class="results-count">
+        Showing <strong>{{ processedBooks.length }}</strong> of {{ books.length }} books
+      </span>
+    </div>
+
+    <div class="table-container">
+      <table class="books-table">
+
+        <thead>
+          <tr>
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'title'"
+                (click)="sortBy('title')">
+              Title
+              <span class="sort-indicator" *ngIf="sortColumn === 'title'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'category'"
+                (click)="sortBy('category')">
+              Category
+              <span class="sort-indicator" *ngIf="sortColumn === 'category'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'publishedYear'"
+                (click)="sortBy('publishedYear')">
+              Year
+              <span class="sort-indicator" *ngIf="sortColumn === 'publishedYear'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'totalCopies'"
+                (click)="sortBy('totalCopies')">
+              Total
+              <span class="sort-indicator" *ngIf="sortColumn === 'totalCopies'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'availableCopies'"
+                (click)="sortBy('availableCopies')">
+              Available
+              <span class="sort-indicator" *ngIf="sortColumn === 'availableCopies'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th class="sortable"
+                [class.sorted]="sortColumn === 'issuedCopies'"
+                (click)="sortBy('issuedCopies')">
+              Issued
+              <span class="sort-indicator" *ngIf="sortColumn === 'issuedCopies'">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <!-- Populated rows -->
+          <tr *ngFor="let book of processedBooks">
+
+            <td class="book-title-cell">
+              <span class="book-title-text" [title]="book.title">{{ book.title }}</span>
+            </td>
+
+            <td>
+              <span class="category-pill">{{ book.category }}</span>
+            </td>
+
+            <td class="year-cell">{{ book.publishedYear }}</td>
+
+            <td class="copy-cell">{{ book.totalCopies }}</td>
+
+            <td class="copy-cell"
+                [class.available-zero]="book.availableCopies === 0"
+                [class.available-low]="book.availableCopies > 0 && book.availableCopies / book.totalCopies < 0.3"
+                [class.available-ok]="book.availableCopies / book.totalCopies >= 0.3">
+              {{ book.availableCopies }}
+            </td>
+
+            <td class="copy-cell">{{ book.issuedCopies }}</td>
+
+            <td class="actions-cell">
+              <button class="action-btn btn-details" (click)="viewDetails(book.id)">
+                Details
+              </button>
+              <button class="action-btn btn-edit" (click)="editBook(book)">
+                Edit
+              </button>
+              <button class="action-btn btn-delete" (click)="deleteBook(book.id)">
+                Delete
+              </button>
+            </td>
+
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="processedBooks.length === 0">
+            <td colspan="7">
+              <div class="empty-state">
+                <span class="empty-icon">📭</span>
+                <span class="empty-title">No books found</span>
+                <span class="empty-sub">Try adjusting your search or category filter</span>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+
 </div>
 
-<table border="1" cellpadding="8" cellspacing="0" width="100%">
-    <thead>
-        <tr>
-            <th (click)="sortBy('title')">Title</th>
-            <th (click)="sortBy('category')">Category</th>
-            <th (click)="sortBy('publishedYear')">Year</th>
-            <th (click)="sortBy('totalCopies')">Total</th>
-            <th (click)="sortBy('availableCopies')">Available</th>
-            <th (click)="sortBy('issuedCopies')">Issued</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr *ngFor="let book of processedBooks">
-            <td>{{ book.title }}</td>
-            <td>{{ book.category }}</td>
-            <td>{{ book.publishedYear }}</td>
-            <td>{{ book.totalCopies }}</td>
-            <td [style.color]="book.availableCopies === 0 ? 'red' : 'black'">
-                {{ book.availableCopies }}
-            </td>
-            <td>{{ book.issuedCopies }}</td>
-            <td>
-                <button (click)="viewDetails(book.id)">Details</button>
-                <button (click)="editBook(book)">Edit</button>
-                <button (click)="deleteBook(book.id)">Delete</button>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-<div *ngIf="showFormModal" style="position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(0,0,0,0.5);
-            display:flex; justify-content:center; align-items:center;">
-
-    <app-book-form [book]="selectedBook" (saved)="onBookSaved()" (cancelled)="closeForm()">
+<!-- ===== Add / Edit Modal ===== -->
+<div class="modal-backdrop" *ngIf="showFormModal" (click)="closeForm()">
+  <div class="modal-inner" (click)="$event.stopPropagation()">
+    <app-book-form
+      [book]="selectedBook"
+      (saved)="onBookSaved()"
+      (cancelled)="closeForm()">
     </app-book-form>
-
+  </div>
 </div>

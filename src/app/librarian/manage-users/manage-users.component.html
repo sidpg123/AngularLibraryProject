@@ -1,42 +1,102 @@
-<h2>Manage Users</h2>
+<div class="manage-page">
 
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+  <!-- ===== Header ===== -->
+  <div class="page-header">
+    <h2 class="page-title">
+      Manage Users
+      <span>{{ users.length }} registered members</span>
+    </h2>
+  </div>
 
-<div *ngIf="errorMessage" style="color:red">
-  {{ errorMessage }}
+  <!-- ===== Loading ===== -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+    <span class="loading-label">Loading users…</span>
+  </div>
+
+  <!-- ===== Error ===== -->
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">
+    {{ errorMessage }}
+  </div>
+
+  <!-- ===== Table ===== -->
+  <div class="table-container" *ngIf="!isLoading">
+    <table class="users-table">
+
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Max Books</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <ng-container *ngFor="let user of users">
+
+          <tr>
+
+            <!-- Avatar + Name + Username -->
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">
+                  {{ user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div class="user-name-stack">
+                  <span class="user-fullname">{{ user.fullName }}</span>
+                 <span class="user-username">{{ '@' + user.username }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="email-cell">{{ user.email }}</td>
+
+            <td>
+              <span class="role-badge" [class.librarian]="user.role === 'librarian'"
+                [class.user]="user.role === 'user'">
+                {{ user.role }}
+              </span>
+            </td>
+
+            <td>
+              <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                {{ user.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <td class="books-cell">{{ user.maxBooksAllowed }}</td>
+
+            <td class="actions-cell">
+              <button class="action-btn btn-details" (click)="viewDetails(user.id)">
+                Details
+              </button>
+              <button class="action-btn" [class.btn-deactivate]="user.isActive" [class.btn-activate]="!user.isActive"
+                (click)="toggleActivation(user)">
+                {{ user.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+            </td>
+
+          </tr>
+
+        </ng-container>
+
+        <!-- Empty state -->
+        <tr *ngIf="users.length === 0">
+          <td colspan="6">
+            <div class="empty-state">
+              <span class="empty-icon">&#128101;</span>
+              <span class="empty-title">No users found</span>
+              <span class="empty-sub">Registered members will appear here</span>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
 </div>
-
-<table border="1" cellpadding="8" cellspacing="0" width="100%">
-  <thead>
-    <tr>
-      <th>Username</th>
-      <th>Full Name</th>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Active</th>
-      <th>Max Books</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr *ngFor="let user of users">
-      <td>{{ user.username }}</td>
-      <td>{{ user.fullName }}</td>
-      <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
-      <td>
-        <span [style.color]="user.isActive ? 'green' : 'red'">
-          {{ user.isActive ? 'Active' : 'Inactive' }}
-        </span>
-      </td>
-      <td>{{ user.maxBooksAllowed }}</td>
-      <td>
-        <button (click)="viewDetails(user.id)">Details</button>
-        <button (click)="toggleActivation(user)">
-          {{ user.isActive ? 'Deactivate' : 'Activate' }}
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>

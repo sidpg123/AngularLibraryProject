@@ -1,52 +1,124 @@
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-<div *ngIf="errorMessage" style="color:red">
-    {{ errorMessage }}
+<!-- Loading -->
+<div class="loading-wrap" *ngIf="isLoading">
+  <app-loading-spinner></app-loading-spinner>
+  <span class="loading-label">Loading issue...</span>
 </div>
 
-<div *ngIf="issue">
+<!-- Error -->
+<div class="error-banner" *ngIf="errorMessage && !isLoading">
+  {{ errorMessage }}
+</div>
 
-    <h2>
-        {{ issue.book?.title }}
+<!-- Detail -->
+<div class="detail-page" *ngIf="issue && !isLoading">
+  <div class="issue-card">
 
-        <span *ngIf="issue.status === 'overdue'" style="background:red; color:white; padding:3px 6px;">
-            OVERDUE
+    <!-- Status stripe -->
+    <div class="status-stripe"
+      [class.issued]="issue.status === 'issued'"
+      [class.overdue]="issue.status === 'overdue'"
+      [class.returned]="issue.status === 'returned'">
+    </div>
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="header-left">
+        <div class="issue-id">Issue #{{ issue.id }}</div>
+        <div class="book-title">{{ issue.book?.title || 'Unknown Book' }}</div>
+      </div>
+      <span class="status-pill"
+        [class.issued]="issue.status === 'issued'"
+        [class.overdue]="issue.status === 'overdue'"
+        [class.returned]="issue.status === 'returned'">
+        {{ issue.status }}
+      </span>
+    </div>
+
+    <!-- Date Info Grid -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Issue Date</span>
+        <span class="info-value">{{ issue.issueDate | date:'MMM d, yyyy' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Due Date</span>
+        <span class="info-value" [class.overdue]="issue.status === 'overdue'">
+          {{ issue.dueDate | date:'MMM d, yyyy' }}
         </span>
-    </h2>
-
-    <p><strong>Issue ID:</strong> {{ issue.id }}</p>
-    <p><strong>Status:</strong> {{ issue.status }}</p>
-    <p><strong>Issue Date:</strong> {{ issue.issueDate | date }}</p>
-    <p><strong>Due Date:</strong> {{ issue.dueDate | date }}</p>
-
-    <div *ngIf="issue.status === 'overdue'" style="color:red;">
-        <p><strong>Fine:</strong> ${{ issue.fineAmount }}</p>
+      </div>
+      <div class="info-item" *ngIf="issue.returnDate">
+        <span class="info-label">Returned</span>
+        <span class="info-value">{{ issue.returnDate | date:'MMM d, yyyy' }}</span>
+      </div>
     </div>
 
-    <div *ngIf="issue.status !== 'returned'">
-        <p>
-            Renewals: {{ issue.renewalCount }} / {{ issue.maxRenewals }}
-            (Remaining: {{ renewalsRemaining }})
-        </p>
+    <!-- Renewals -->
+    <div class="renewals-section" *ngIf="issue.status !== 'returned'">
+      <span class="renewals-label">Renewals used</span>
+      <div class="renewals-track-wrap">
+        <div class="renewals-track">
+          <div class="renewals-fill"
+            [class.maxed]="renewalsRemaining === 0"
+            [style.width.%]="(issue.renewalCount / issue.maxRenewals) * 100">
+          </div>
+        </div>
+        <span class="renewals-text" [class.maxed]="renewalsRemaining === 0">
+          {{ issue.renewalCount }} / {{ issue.maxRenewals }} used
+        </span>
+      </div>
+      <span class="renewals-remaining" [class.zero]="renewalsRemaining === 0">
+        {{ renewalsRemaining === 0 ? 'No renewals left' : renewalsRemaining + ' remaining' }}
+      </span>
     </div>
 
-    <div style="margin-top:10px;">
+    <!-- Fine -->
+    <div class="fine-section" *ngIf="fineDetails && issue.status !== 'returned'">
+      <div class="fine-label-group">
+        <span class="fine-title">Accrued Fine</span>
+        <span class="fine-sub" *ngIf="fineDetails.isOverdue">Overdue &#8212; accumulating daily</span>
+        <span class="fine-sub" *ngIf="!fineDetails.isOverdue">No fine yet</span>
+      </div>
+      <span class="fine-amount" [class.zero]="fineDetails.calculatedFine === 0">
+        ${{ fineDetails.calculatedFine }}
+      </span>
+    </div>
 
-        <!-- Renew -->
-        <button *ngIf="issue.status === 'issued'" [disabled]="renewalsRemaining === 0 || actionLoading"
-            (click)="renew()">
-            Renew
-        </button>
+    <!-- Actions -->
+    <div class="actions-section">
 
-        <!-- Return -->
-        <button *ngIf="issue.status === 'issued'" [disabled]="actionLoading" (click)="returnBook()">
-            Return
-        </button>
+      <!-- Returned notice -->
+      <span class="returned-notice" *ngIf="issue.status === 'returned'">
+        This book has been returned
+      </span>
 
-        <!-- Pay & Return -->
-        <button *ngIf="fineDetails?.isOverdue && fineDetails?.status === 'issued'" [disabled]="actionLoading" (click)="payAndReturn()">
-            Pay Fine & Return
-        </button>
+      <!-- Renew -->
+      <button class="btn-action btn-renew"
+        *ngIf="issue.status === 'issued'"
+        [disabled]="renewalsRemaining === 0 || actionLoading"
+        (click)="renew()">
+        <span class="btn-spinner" *ngIf="actionLoading"></span>
+        {{ renewalsRemaining === 0 ? 'No Renewals Left' : 'Renew' }}
+      </button>
+
+      <!-- Return (no fine) -->
+      <button class="btn-action btn-return"
+        *ngIf="issue.status === 'issued' && !(fineDetails?.isOverdue)"
+        [disabled]="actionLoading"
+        (click)="returnBook()">
+        <span class="btn-spinner" *ngIf="actionLoading"></span>
+        Return Book
+      </button>
+
+      <!-- Pay & Return (has fine) -->
+      <button class="btn-action btn-pay-return"
+        *ngIf="fineDetails?.isOverdue && fineDetails?.status === 'issued'"
+        [disabled]="actionLoading"
+        (click)="payAndReturn()">
+        <span class="btn-spinner" *ngIf="actionLoading"></span>
+        Pay Fine &amp; Return
+      </button>
 
     </div>
 
+  </div>
 </div>

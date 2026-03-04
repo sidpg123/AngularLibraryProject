@@ -1,19 +1,134 @@
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-<div *ngIf="errorMessage" style="color:red">
+<!-- ===== Loading ===== -->
+<div class="loading-wrap" *ngIf="isLoading">
+  <app-loading-spinner></app-loading-spinner>
+  <span class="loading-label">Loading book…</span>
+</div>
+
+<!-- ===== Error ===== -->
+<div class="error-banner" *ngIf="errorMessage && !isLoading">
   {{ errorMessage }}
 </div>
 
-<div *ngIf="book">
+<!-- ===== Book Detail ===== -->
+<div class="detail-page" *ngIf="book && !isLoading">
 
-  <h2>{{ book.title }}</h2>
+  <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    <span class="back-arrow">←</span>
+    Back to Manage Books
+  </button>
 
-  <p><strong>Category:</strong> {{ book.category }}</p>
-  <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-  <p><strong>Published:</strong> {{ book.publishedYear }}</p>
-  <p><strong>Total Copies:</strong> {{ book.totalCopies }}</p>
-  <p><strong>Available:</strong> {{ book.availableCopies }}</p>
-  <p><strong>Issued:</strong> {{ book.issuedCopies }}</p>
+  <!-- Main Card -->
+  <div class="book-card">
 
-  <button (click)="goBack()">Back</button>
+    <!-- Hero: Cover + Info -->
+    <div class="book-hero">
 
+      <!-- Cover -->
+      <div class="cover-col">
+        <img
+          *ngIf="book.coverImage; else noCover"
+          [src]="book.coverImage"
+          [alt]="book.title"
+          class="book-cover"
+        />
+        <ng-template #noCover>
+          <div class="cover-placeholder">
+            📖
+            <span>No Cover</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Info -->
+      <div class="info-col">
+
+        <!-- Category Badge -->
+        <span class="category-badge">{{ book.category }}</span>
+
+        <!-- Title -->
+        <h1 class="book-title">{{ book.title }}</h1>
+
+        <!-- Description -->
+        <p class="book-description" *ngIf="book.body">{{ book.body }}</p>
+
+        <!-- ISBN + Year -->
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">ISBN</span>
+            <span class="meta-value">{{ book.isbn }}</span>
+          </div>
+          <div class="meta-sep"></div>
+          <div class="meta-item">
+            <span class="meta-label">Published</span>
+            <span class="meta-value">{{ book.publishedYear }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Availability Section -->
+    <div class="availability-section">
+      <div class="availability-heading">Availability</div>
+
+      <!-- Stat Chips -->
+      <div class="stat-chips">
+
+        <div class="stat-chip">
+          <span class="chip-label">Total Copies</span>
+          <span class="chip-value">{{ book.totalCopies }}</span>
+        </div>
+
+        <div class="stat-chip">
+          <span class="chip-label">Available</span>
+          <span
+            class="chip-value available"
+            [class.overdue]="book.availableCopies === 0">
+            {{ book.availableCopies }}
+          </span>
+        </div>
+
+        <div class="stat-chip">
+          <span class="chip-label">Issued</span>
+          <span class="chip-value issued">{{ book.issuedCopies }}</span>
+        </div>
+
+      </div>
+
+      <!-- Availability Bar -->
+      <div class="avail-bar-wrap" *ngIf="book.totalCopies > 0">
+        <div class="avail-bar-labels">
+          <span class="avail-bar-text">
+            {{ book.availableCopies }} of {{ book.totalCopies }} available
+          </span>
+          <span class="avail-bar-pct">
+            {{ (book.availableCopies / book.totalCopies * 100) | number:'1.0-0' }}%
+          </span>
+        </div>
+        <div class="avail-bar-track">
+          <div
+            class="avail-bar-fill"
+            [class.low]="(book.availableCopies / book.totalCopies) < 0.3 && book.availableCopies > 0"
+            [class.none]="book.availableCopies === 0"
+            [style.width.%]="book.availableCopies / book.totalCopies * 100">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="book-footer">
+      <span class="footer-text">
+        Added on <strong>{{ book.addedDate | date:'MMM d, yyyy' }}</strong>
+      </span>
+      <span class="footer-text" *ngIf="book.addedBy">
+        Added by <strong>{{ book.addedBy }}</strong>
+      </span>
+    </div>
+
+  </div>
 </div>

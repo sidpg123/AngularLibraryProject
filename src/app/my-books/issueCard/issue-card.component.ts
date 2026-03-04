@@ -1,20 +1,23 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Issue } from '../../models/issue.model';
 import { FineCalculationPreview } from '../../models/fine.model';
 
 @Component({
   selector: 'app-issue-card',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './issue-card.component.html'
+  imports: [CommonModule, DatePipe],
+  templateUrl: './issue-card.component.html',
+  styleUrl: './issue-card.component.css'
 })
 export class IssueCardComponent {
 
   @Input() issue!: Issue;
-  @Output() viewDetails = new EventEmitter<number>();
   @Input() calculatedFine?: FineCalculationPreview;
-  constructor() {}
+  @Input() index: number = 0;
+
+  @Output() viewDetails = new EventEmitter<number>();
+
   onDetailsClick(): void {
     this.viewDetails.emit(this.issue.id);
   }

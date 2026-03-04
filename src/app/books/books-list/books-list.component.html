@@ -1,20 +1,45 @@
-<h2>Books</h2>
+<div class="books-page">
 
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+  <div class="page-header">
+    <h2 class="page-title">
+      Books
+      <span>{{ books.length }} titles in the library</span>
+    </h2>
+  </div>
 
-<div *ngIf="errorMessage" style="color:red">
-  {{ errorMessage }}
-</div>
+  <div class="loading-wrap" *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+    <span class="loading-label">Loading books...</span>
+  </div>
 
-<div *ngIf="!isLoading && books.length === 0">
-  No books available.
-</div>
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">
+    {{ errorMessage }}
+  </div>
 
-<div *ngFor="let book of books">
-  <app-book-card
-    [book]="book"
-    (viewDetails)="onViewDetails($event)"
-    (issueBook)="onIssueBook($event)"
-    >
-  </app-book-card>
+  <div class="books-toolbar">
+
+    <input type="text" placeholder="Search books..." class="search-input" (input)="onSearch($event)">
+
+  </div>
+
+  <!-- <select class="filter-select" (change)="onFilter($event)">
+    <option value="">All Categories</option>
+    <option value="Fiction">Fiction</option>
+    <option value="Science">Science</option>
+    <option value="History">History</option>
+  </select> -->
+
+  <div class="books-grid" *ngIf="!isLoading">
+
+    <app-book-card *ngFor="let book of books; let i = index" [book]="book" [index]="i"
+      (viewDetails)="onViewDetails($event)" (issueBook)="onIssueBook($event)">
+    </app-book-card>
+
+    <div class="empty-state" *ngIf="books.length === 0">
+      <span class="empty-title">No books available</span>
+      <span class="empty-sub">Check back soon for new additions</span>
+    </div>
+
+  </div>
+
 </div>

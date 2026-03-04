@@ -1,0 +1,127 @@
+<div class="profile-page">
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+    <span class="loading-label">Loading profile...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Profile Card -->
+  <div class="profile-card" *ngIf="user && !isLoading">
+
+    <!-- Gradient hero -->
+    <div class="profile-hero"></div>
+
+    <!-- Avatar + name -->
+    <div class="profile-header">
+      <div class="avatar">
+        {{ user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase() }}
+      </div>
+      <div class="header-meta">
+        <div class="user-name">{{ user.fullName }}</div>
+        <div class="user-badges">
+          <span class="username-mono">&#64;{{ user.username }}</span>
+          <span class="badge"
+            [class.badge-role-librarian]="user.role === 'librarian'"
+            [class.badge-role-user]="user.role === 'user'">
+            {{ user.role }}
+          </span>
+          <span class="badge badge-status"
+            [class.badge-active]="user.isActive"
+            [class.badge-inactive]="!user.isActive">
+            {{ user.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info grid -->
+    <div class="info-grid">
+
+      <div class="info-item">
+        <span class="info-label">
+          <span class="info-label-icon">&#9993;</span> Email
+        </span>
+        <span class="info-value" [class.empty]="!user.email">
+          {{ user.email || 'Not provided' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">
+          <span class="info-label-icon">&#128222;</span> Phone
+        </span>
+        <span class="info-value" [class.empty]="!user.phone">
+          {{ user.phone || 'Not provided' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">
+          <span class="info-label-icon">&#127968;</span> Address
+        </span>
+        <span class="info-value" [class.empty]="!user.address">
+          {{ user.address || 'Not provided' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">
+          <span class="info-label-icon">&#128218;</span> Max Books Allowed
+        </span>
+        <span class="max-books-chip">{{ user.maxBooksAllowed ?? 3 }}</span>
+      </div>
+
+    </div>
+
+    <!-- Borrowing stats -->
+    <!-- <div class="stats-section" *ngIf="stats">
+      <div class="stats-label">Borrowing Activity</div>
+      <div class="stats-chips">
+        <div class="stat-chip c1">
+          <span class="chip-value">{{ stats.totalBorrowed }}</span>
+          <span class="chip-label">Total</span>
+        </div>
+        <div class="stat-chip c2">
+          <span class="chip-value">{{ stats.currentlyBorrowed }}</span>
+          <span class="chip-label">Active</span>
+        </div>
+        <div class="stat-chip c3">
+          <span class="chip-value">{{ stats.overdue }}</span>
+          <span class="chip-label">Overdue</span>
+        </div>
+        <div class="stat-chip c4">
+          <span class="chip-value">${{ stats.unpaidFines ?? 0 }}</span>
+          <span class="chip-label">Unpaid Fines</span>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Footer: edit button -->
+    <div class="card-footer">
+      <span class="footer-note">Member since {{ user.joinDate | date:'MMM yyyy' }}</span>
+      <button class="btn-edit-profile" (click)="openEdit()">
+        Edit Profile
+        <span class="arrow">&#8594;</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" *ngIf="showEditModal" (click)="closeEdit()">
+  <div class="modal-inner" (click)="$event.stopPropagation()">
+    <app-user-form
+      [user]="user!"
+      (saved)="onSaved()"
+      (cancelled)="closeEdit()">
+    </app-user-form>
+  </div>
+</div>

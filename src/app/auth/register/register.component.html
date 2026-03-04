@@ -1,77 +1,170 @@
-<div class="register-wrapper">
-  <div class="register-card">
-    <h2>Create Account</h2>
-    <p class="subtitle">Join the Library System</p>
+<div class="register-card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="header-icon">📚</div>
+    <h2 class="card-title">Create an account</h2>
+    <p class="card-subtitle">Join the LibraryMS community</p>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <!-- Server error -->
+    <div class="server-error" *ngIf="errMsg">
+      <span class="error-icon">!</span>
+      {{ errMsg }}
+    </div>
 
     <form (ngSubmit)="register()" #registerForm="ngForm">
 
-      <div class="form-group">
-        <label>Username *</label>
-        <input 
-          type="text"
-          name="username"
-          [(ngModel)]="username"
-          required
-          placeholder="Enter username">
+      <!-- Section: Account -->
+      <div class="section-label">Account Info</div>
+
+      <!-- Username + Email -->
+      <div class="field-row">
+
+        <div class="form-group">
+          <label>Username <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">&#64;</span>
+            <input
+              type="text"
+              name="username"
+              [(ngModel)]="username"
+              required
+              minlength="3"
+              #formUsername="ngModel"
+              [class.is-invalid]="formUsername.invalid && formUsername.touched"
+              placeholder="e.g. jdoe"
+            />
+          </div>
+          @if (formUsername.invalid && formUsername.touched) {
+            <span class="field-error">
+              @if (formUsername.errors?.['required']) { Username is required }
+              @else if (formUsername.errors?.['minlength']) { At least 3 characters }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Password <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              required
+              minlength="6"
+              #formPassword="ngModel"
+              [class.is-invalid]="formPassword.invalid && formPassword.touched"
+              placeholder="Min. 6 characters"
+            />
+          </div>
+          @if (formPassword.invalid && formPassword.touched) {
+            <span class="field-error">
+              @if (formPassword.errors?.['required']) { Password is required }
+              @else if (formPassword.errors?.['minlength']) { At least 6 characters }
+            </span>
+          }
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label>Email *</label>
-        <input 
-          type="email"
-          name="email"
-          [(ngModel)]="email"
-          required
-          placeholder="Enter email">
+      <!-- Email (full width) -->
+      <div class="form-group" style="margin-top: 2px;">
+        <label>Email <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">&#9993;</span>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            required
+            email
+            #formEmail="ngModel"
+            [class.is-invalid]="formEmail.invalid && formEmail.touched"
+            placeholder="you@example.com"
+          />
+        </div>
+        @if (formEmail.invalid && formEmail.touched) {
+          <span class="field-error">
+            @if (formEmail.errors?.['required']) { Email is required }
+            @else if (formEmail.errors?.['email']) { Enter a valid email address }
+          </span>
+        }
       </div>
 
+      <!-- Section: Personal -->
+      <div class="section-label" style="margin-top: 8px;">Personal Details</div>
+
+      <!-- Full name (full width) -->
       <div class="form-group">
-        <label>Full Name *</label>
-        <input 
-          type="text"
-          name="fullName"
-          [(ngModel)]="fullName"
-          required
-          placeholder="Enter full name">
+        <label>Full Name <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            name="fullName"
+            [(ngModel)]="fullName"
+            required
+            #formFullName="ngModel"
+            [class.is-invalid]="formFullName.invalid && formFullName.touched"
+            placeholder="Jane Doe"
+          />
+        </div>
+        @if (formFullName.invalid && formFullName.touched) {
+          <span class="field-error">Full name is required</span>
+        }
       </div>
 
-      <div class="form-group">
-        <label>Phone</label>
-        <input 
-          type="text"
-          name="phone"
-          [(ngModel)]="phone"
-          placeholder="Enter phone number">
+      <!-- Phone + Address -->
+      <div class="field-row">
+
+        <div class="form-group">
+          <label>Phone</label>
+          <div class="input-wrap">
+            <span class="input-icon">📞</span>
+            <input
+              type="text"
+              name="phone"
+              [(ngModel)]="phone"
+              placeholder="+1 555 000 0000"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Address</label>
+          <div class="input-wrap">
+            <span class="input-icon textarea-icon">🏠</span>
+            <textarea
+              name="address"
+              [(ngModel)]="address"
+              placeholder="123 Main St...">
+            </textarea>
+          </div>
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label>Address</label>
-        <textarea 
-          name="address"
-          [(ngModel)]="address"
-          placeholder="Enter address"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>Password *</label>
-        <input 
-          type="password"
-          name="password"
-          [(ngModel)]="password"
-          required
-          placeholder="Enter password">
-      </div>
-
-      <button type="submit" class="register-btn">
-        Register
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="btn-register"
+        [disabled]="registerForm.invalid">
+        Create Account
+        <span class="btn-arrow">&#8594;</span>
       </button>
 
     </form>
 
-    <div class="login-link">
-      Already have an account?
-      <a routerLink="/login">Login</a>
+    <!-- Login link -->
+    <div class="login-row">
+      Already have an account? <a routerLink="/auth/login">Sign in</a>
     </div>
 
   </div>
+
 </div>

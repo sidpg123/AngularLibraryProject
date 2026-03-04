@@ -1,57 +1,104 @@
-<h2>My Books</h2>
+<div class="my-books-page">
 
-<!-- Fine Summary Section -->
-<div style="border:1px solid #aaa; padding:10px; margin-bottom:15px;">
-
-  <h3>Fine Summary</h3>
-
-  <div *ngIf="fineLoading">Loading fines...</div>
-
-  <div *ngIf="fineError" style="color:red;">
-    {{ fineError }}
+  <!-- Header -->
+  <div class="page-header">
+    <h2 class="page-title">
+      My Books
+      <span>{{ issues.length }} total borrowings</span>
+    </h2>
   </div>
 
-  <div *ngIf="fineSummary">
+  <!-- Fine Summary Card -->
+  <div class="fine-card">
 
-    <p><strong>Total Lifetime Fines:</strong> ${{ fineSummary.totalFines }}</p>
-    <p><strong>Paid Fines:</strong> ${{ fineSummary.paidFines }}</p>
-    <p style="color:red;">
-      <strong>Unpaid Fines:</strong> ${{ fineSummary.unpaidFines }}
-    </p>
-    <p>
-      <strong>Unpaid Issues:</strong> {{ fineSummary.unpaidIssuesCount }}
-    </p>
+    <div class="fine-card-header">
+      <span class="fine-card-title">Fine Summary</span>
+      <span class="fine-loading-inline" *ngIf="fineLoading">Updating...</span>
+    </div>
 
-    <button
-      *ngIf="fineSummary.unpaidFines > 0"
-      [disabled]="fineLoading"
-      (click)="payAllFines()">
-      Pay All Fines
+    <div class="fine-stats" *ngIf="fineSummary">
+      <div class="fine-stat">
+        <span class="fine-stat-label">Lifetime Fines</span>
+        <span class="fine-stat-value">${{ fineSummary.totalFines }}</span>
+      </div>
+      <div class="fine-stat">
+        <span class="fine-stat-label">Paid</span>
+        <span class="fine-stat-value paid">${{ fineSummary.paidFines }}</span>
+      </div>
+      <div class="fine-stat">
+        <span class="fine-stat-label">Unpaid</span>
+        <span class="fine-stat-value unpaid">${{ fineSummary.unpaidFines }}</span>
+      </div>
+      <div class="fine-stat">
+        <span class="fine-stat-label">Unpaid Issues</span>
+        <span class="fine-stat-value">{{ fineSummary.unpaidIssuesCount }}</span>
+      </div>
+    </div>
+
+    <div class="fine-error" *ngIf="fineError">{{ fineError }}</div>
+
+    <div class="fine-card-footer" *ngIf="fineSummary">
+      <span class="fine-notice" [class.has-unpaid]="fineSummary.unpaidFines > 0">
+        {{ fineSummary.unpaidFines > 0 ? 'You have outstanding fines' : 'All fines paid' }}
+      </span>
+      <button
+        class="btn-pay-all"
+        *ngIf="fineSummary.unpaidFines > 0"
+        [disabled]="fineLoading"
+        (click)="payAllFines()">
+        Pay All Fines
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="filter-tab" [class.active]="selectedStatus === 'all'" (click)="changeFilter('all')">
+      All
+      <span class="tab-count">{{ issues.length }}</span>
     </button>
+    <button class="filter-tab" [class.active]="selectedStatus === 'issued'" (click)="changeFilter('issued')">
+      Issued
+      <span class="tab-count">{{ issues | issueCount:'issued' }}</span>
+    </button>
+    <button class="filter-tab overdue" [class.active]="selectedStatus === 'overdue'" (click)="changeFilter('overdue')">
+      Overdue
+      <span class="tab-count">{{ issues | issueCount:'overdue' }}</span>
+    </button>
+    <button class="filter-tab returned" [class.active]="selectedStatus === 'returned'" (click)="changeFilter('returned')">
+      Returned
+      <span class="tab-count">{{ issues | issueCount:'returned' }}</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+    <span class="loading-label">Loading your books...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner" *ngIf="errorMessage && !isLoading">{{ errorMessage }}</div>
+
+  <!-- Issues -->
+  <div class="issues-stack" *ngIf="!isLoading">
+
+    <app-issue-card
+      *ngFor="let issue of filteredIssues; let i = index"
+      [issue]="issue"
+      [index]="i"
+      [calculatedFine]="calculatedFines[issue.id]"
+      (viewDetails)="openDetails($event)">
+    </app-issue-card>
+
+    <div class="empty-state" *ngIf="filteredIssues.length === 0">
+      <span class="empty-title">No books found</span>
+      <span class="empty-sub">
+        {{ selectedStatus === 'all' ? 'You have not borrowed any books yet' : 'No ' + selectedStatus + ' books' }}
+      </span>
+    </div>
 
   </div>
-</div>
 
-<div style="margin-bottom:10px;">
-  <button (click)="changeFilter('all')">All</button>
-  <button (click)="changeFilter('issued')">Issued</button>
-  <button (click)="changeFilter('overdue')">Overdue</button>
-  <button (click)="changeFilter('returned')">Returned</button>
-</div>
-
-<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-<div *ngIf="errorMessage" style="color:red">
-  {{ errorMessage }}
-</div>
-
-<div *ngIf="filteredIssues.length === 0">
-  No books found.
-</div>
-
-<div *ngFor="let issue of filteredIssues">
-  <app-issue-card
-  [issue]="issue"
-  [calculatedFine]="calculatedFines[issue.id]"
-  (viewDetails)="openDetails($event)">
-</app-issue-card>
 </div>
